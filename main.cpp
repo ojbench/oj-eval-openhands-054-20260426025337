@@ -350,11 +350,6 @@ Term get_term(const string& s, int l, int r) {
 }
 
 Frac dfs(const string& s, int l, int r) {
-    // Handle parentheses
-    if (s[l] == '(' && s[r-1] == ')') {
-        return dfs(s, l + 1, r - 1);
-    }
-    
     // Handle addition and subtraction - find rightmost + or - for left-to-right evaluation
     int balance = 0;
     int last_op = -1;
@@ -390,6 +385,11 @@ Frac dfs(const string& s, int l, int r) {
         Frac right = dfs(s, last_mul_div + 1, r);
         if (s[last_mul_div] == '*') return left * right;
         else return left / right;
+    }
+    
+    // Handle parentheses
+    if (s[l] == '(' && s[r-1] == ')') {
+        return dfs(s, l + 1, r - 1);
     }
     
     // Single term
