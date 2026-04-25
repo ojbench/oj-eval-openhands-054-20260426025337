@@ -350,7 +350,12 @@ Term get_term(const string& s, int l, int r) {
 }
 
 Frac dfs(const string& s, int l, int r) {
-    // Handle parentheses - find rightmost + or - for left-to-right evaluation
+    // Handle parentheses
+    if (s[l] == '(' && s[r-1] == ')') {
+        return dfs(s, l + 1, r - 1);
+    }
+    
+    // Handle addition and subtraction - find rightmost + or - for left-to-right evaluation
     int balance = 0;
     int last_op = -1;
     for (int i = l; i < r; i++) {
@@ -369,22 +374,22 @@ Frac dfs(const string& s, int l, int r) {
         else return left - right;
     }
     
-    // Handle multiplication and division
+    // Handle multiplication and division - find rightmost * or / for left-to-right evaluation
     balance = 0;
+    int last_mul_div = -1;
     for (int i = l; i < r; i++) {
         if (s[i] == '(') balance++;
         else if (s[i] == ')') balance--;
         else if (balance == 0 && (s[i] == '*' || s[i] == '/')) {
-            Frac left = dfs(s, l, i);
-            Frac right = dfs(s, i + 1, r);
-            if (s[i] == '*') return left * right;
-            else return left / right;
+            last_mul_div = i;
         }
     }
     
-    // Handle parentheses
-    if (s[l] == '(' && s[r-1] == ')') {
-        return dfs(s, l + 1, r - 1);
+    if (last_mul_div != -1) {
+        Frac left = dfs(s, l, last_mul_div);
+        Frac right = dfs(s, last_mul_div + 1, r);
+        if (s[last_mul_div] == '*') return left * right;
+        else return left / right;
     }
     
     // Single term
